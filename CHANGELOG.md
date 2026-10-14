@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-14
+
 ### Added
 
 - One camera device per address of the "Cameras" field (a URL and an
@@ -27,3 +29,6 @@ the notes of the version's GitHub Release.
 - "Test cameras" button: kind, resolution, size and time of one capture per
   camera, or the error.
 - Optional acceptance of self-signed certificates for https cameras.
+
+[Unreleased]: https://github.com/LM1LC3N7/gladys-mjpeg-camera/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/LM1LC3N7/gladys-mjpeg-camera/releases/tag/v0.1.1

@@ -1,6 +1,6 @@
 {
   "name": "gladys-mjpeg-camera",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "MJPEG and snapshot IP cameras for Gladys Assistant (ESP32-CAM, older IP cameras, webcams): camera images in Gladys without RTSP, on the local network.",
   "type": "module",

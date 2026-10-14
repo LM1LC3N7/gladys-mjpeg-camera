@@ -1,0 +1,162 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "MJPEG & snapshot cameras",
+  "description": {
+    "en": "ESP32-CAM, MJPEG and JPEG snapshot IP cameras of your network in Gladys, without RTSP.",
+    "fr": "ESP32-CAM, caméras IP MJPEG et à image fixe de votre réseau dans Gladys, sans RTSP."
+  },
+  "version": "0.1.0",
+  "docker_image": "ghcr.io/lm1lc3n7/gladys-mjpeg-camera:0.1.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/LM1LC3N7/gladys-mjpeg-camera/main/cover.png",
+  "categories": ["security"],
+  "transports": ["local"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": { "en": "Cameras without RTSP", "fr": "Caméras sans RTSP" },
+      "description": {
+        "en": "For the cameras that speak plain HTTP: an ESP32-CAM, an older IP camera, a webcam behind motion, motionEye or mjpg-streamer. Each address below becomes a camera in Discovery; its image reaches the dashboard every few seconds and whenever you open the live view. Both kinds of address work: a JPEG snapshot URL and an MJPEG stream (the first frame is taken, then the connection is closed). Everything stays on your local network, no ffmpeg. For an RTSP camera, use the RTSP camera integration built into Gladys instead. Not affiliated with any camera maker.",
+        "fr": "Pour les caméras qui parlent simplement HTTP : un ESP32-CAM, une ancienne caméra IP, une webcam derrière motion, motionEye ou mjpg-streamer. Chaque adresse ci-dessous devient une caméra dans Découverte ; son image arrive sur le tableau de bord toutes les quelques secondes et à chaque ouverture de la vue en direct. Les deux types d'adresse fonctionnent : une URL d'image JPEG fixe et un flux MJPEG (la première image est prise, puis la connexion est fermée). Tout reste sur votre réseau local, sans ffmpeg. Pour une caméra RTSP, utilisez plutôt l'intégration caméra RTSP intégrée à Gladys. Sans lien avec aucun fabricant de caméras."
+      },
+      "links": [
+        {
+          "url": "https://github.com/LM1LC3N7/gladys-mjpeg-camera/blob/main/docs/fr.md",
+          "label": { "en": "Guide (French)", "fr": "Guide (français)" }
+        },
+        {
+          "url": "https://github.com/LM1LC3N7/gladys-mjpeg-camera/blob/main/docs/en.md",
+          "label": { "en": "Guide (English)", "fr": "Guide (anglais)" }
+        }
+      ]
+    },
+    {
+      "key": "cameras",
+      "type": "string",
+      "label": { "en": "Cameras", "fr": "Caméras" },
+      "description": {
+        "en": "Addresses separated by commas, each followed by an optional name after a space or |. A password can go in the address (http://user:password@…, Basic or Digest), or only the user name, with the password in the field below.",
+        "fr": "Adresses séparées par des virgules, chacune suivie d'un nom facultatif après une espace ou |. Un mot de passe peut figurer dans l'adresse (http://utilisateur:motdepasse@…, Basic ou Digest), ou seulement le nom d'utilisateur, avec le mot de passe dans le champ ci-dessous."
+      },
+      "required": false,
+      "placeholder": {
+        "en": "http://192.168.1.50:81/stream Garden, http://admin@192.168.1.20/cgi-bin/snapshot.cgi Front door",
+        "fr": "http://192.168.1.50:81/stream Jardin, http://admin@192.168.1.20/cgi-bin/snapshot.cgi Entrée"
+      }
+    },
+    {
+      "key": "camera_password",
+      "type": "secret",
+      "label": {
+        "en": "Camera password (optional)",
+        "fr": "Mot de passe des caméras (facultatif)"
+      },
+      "description": {
+        "en": "Used for the addresses that carry a user name without a password (http://admin@192.168.1.20/…): it stays hidden here, unlike a password typed in the address.",
+        "fr": "Utilisé pour les adresses qui portent un nom d'utilisateur sans mot de passe (http://admin@192.168.1.20/…) : il reste masqué ici, contrairement à un mot de passe saisi dans l'adresse."
+      },
+      "required": false
+    },
+    {
+      "key": "refresh_seconds",
+      "type": "number",
+      "label": { "en": "Image refresh (seconds)", "fr": "Rafraîchissement de l'image (secondes)" },
+      "description": {
+        "en": "How often each camera's image is sent to Gladys: 5 at least (Gladys takes 12 images a minute per camera), 0 for on demand only (the live view and the scenes still get a fresh image).",
+        "fr": "Fréquence d'envoi de l'image de chaque caméra à Gladys : 5 au minimum (Gladys accepte 12 images par minute et par caméra), 0 pour la demande uniquement (la vue en direct et les scènes reçoivent quand même une image fraîche)."
+      },
+      "required": false,
+      "default": 10,
+      "min": 0,
+      "max": 3600
+    },
+    {
+      "key": "allow_self_signed",
+      "type": "boolean",
+      "label": {
+        "en": "Accept self-signed certificates (https cameras of your network)",
+        "fr": "Accepter les certificats auto-signés (caméras https de votre réseau)"
+      },
+      "required": false,
+      "default": false
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_cameras",
+      "timeout_seconds": 60,
+      "label": { "en": "Test cameras", "fr": "Tester les caméras" },
+      "description": {
+        "en": "Takes one image of every camera above: snapshot or stream, resolution, size, time, or the error.",
+        "fr": "Prend une image de chaque caméra ci-dessus : image fixe ou flux, résolution, taille, durée, ou l'erreur."
+      }
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "camera_offline",
+      "label": { "en": "Camera offline", "fr": "Caméra hors ligne" },
+      "description": {
+        "en": "A camera that was sending images failed 3 captures in a row (no answer, refused, not an image).",
+        "fr": "Une caméra qui envoyait des images a échoué 3 captures de suite (pas de réponse, refus, pas une image)."
+      },
+      "fields": [
+        {
+          "key": "camera",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": { "en": "Camera (empty: any)", "fr": "Caméra (vide : toutes)" }
+        }
+      ],
+      "variables": [
+        {
+          "key": "name",
+          "type": "string",
+          "label": { "en": "Camera name", "fr": "Nom de la caméra" }
+        },
+        {
+          "key": "error",
+          "type": "string",
+          "label": { "en": "Last error", "fr": "Dernière erreur" }
+        },
+        {
+          "key": "failures",
+          "type": "number",
+          "label": { "en": "Failed captures", "fr": "Captures échouées" }
+        }
+      ]
+    },
+    {
+      "key": "camera_online",
+      "label": { "en": "Camera back online", "fr": "Caméra de nouveau en ligne" },
+      "description": {
+        "en": "A camera announced offline sends images again.",
+        "fr": "Une caméra annoncée hors ligne envoie de nouveau des images."
+      },
+      "fields": [
+        {
+          "key": "camera",
+          "type": "select",
+          "source": "devices",
+          "required": false,
+          "label": { "en": "Camera (empty: any)", "fr": "Caméra (vide : toutes)" }
+        }
+      ],
+      "variables": [
+        {
+          "key": "name",
+          "type": "string",
+          "label": { "en": "Camera name", "fr": "Nom de la caméra" }
+        },
+        {
+          "key": "offline_minutes",
+          "type": "number",
+          "label": { "en": "Minutes offline", "fr": "Minutes hors ligne" }
+        }
+      ]
+    }
+  ]
+}
